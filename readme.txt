@@ -2,8 +2,27 @@
 
 
 
+если прям в лоб то что то аля
 
-если прям в лоб то что то аля ```UPDATE full_name
+```
+CREATE TEMP TABLE temp_names (name TEXT, status INTEGER);
+INSERT INTO temp_names (name, status)
+SELECT name, status FROM short_names;
+UPDATE full_names SET status = temp_names.status
+FROM temp_names WHERE full_names.name LIKE temp_names.name || '%';
+DROP TABLE temp_names;```
+
+или ```
+UPDATE full_names SET status = short_names.status
+FROM short_names WHERE full_names.name LIKE short_names.name || '%';
+WHILE EXISTS (SELECT 1 FROM full_names WHERE status IS NULL) LOOP
+  UPDATE full_names SET status = short_names.status
+  FROM short_names WHERE full_names.name LIKE short_names.name || '%' AND full_names.status IS NULL;
+END LOOP;
+```
+
+ если не через like 
+```UPDATE full_name
 SET status = (
   SELECT status FROM short_name
   WHERE short_name.name_short = SUBSTR(full_name.name_full, 1, LENGTH(full_name.name_full) - LENGTH(SUBSTRING_INDEX(full_name.name_full, '.', -1)) - 1)
